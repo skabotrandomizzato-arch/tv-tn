@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "tv": [
+    { "id": "watania1", "name": "Watania 1", "category": "Généraliste", "type": "hls", "url": "https://sw1.tanitweb.net/TunisiaTV/_definst_/watania1/chunklist.m3u8", "youtube": "UCdvWVsmQBROkgcGzVep73oA", "color": "#C8102E" },
+    { "id": "watania2", "name": "Watania 2", "category": "Généraliste", "type": "hls", "url": "https://sw1.tanitweb.net/TunisiaTV/_definst_/watania2/playlist.m3u8", "youtube": "UCJW9gatYczI191TunQxMGbA", "color": "#1D4ED8" },
+    { "id": "hiwar", "name": "Elhiwar Ettounsi", "category": "Généraliste", "type": "youtube", "youtube": "UCXzmMkXaHxMVlutDBD8goHA", "color": "#E11D48" },
+    { "id": "attessia", "name": "Attessia TV", "category": "Généraliste", "type": "youtube", "youtube": "UCQS3ejF2jBAhwmbGD9Q3oeA", "color": "#7C3AED" },
+    { "id": "nessma", "name": "Nessma TV", "category": "Généraliste", "type": "youtube", "youtube": "UC-48PCT3flS86JkLzxlTA9g", "color": "#0EA5E9" },
+    { "id": "hannibal", "name": "Hannibal TV", "category": "Généraliste", "type": "youtube", "youtube": "UCMowjs_MJ-oIWEeHUu3DrOQ", "color": "#B45309" },
+    { "id": "zitouna", "name": "Zitouna TV", "category": "Religion", "type": "youtube", "youtube": "UCruhKc73GretC8MZASMaobA", "color": "#15803D" },
+    { "id": "hiwarsport", "name": "Elhiwar Sport", "category": "Sport", "type": "youtube", "youtube": "UCpbWIjml4Jl7JW9HlFG935g", "color": "#F97316" },
+    { "id": "mosaiquetv", "name": "Mosaique FM TV", "category": "Radio TV", "type": "hls", "url": "https://webcam.mosaiquefm.net/mosatv/_definst_/studio/playlist.m3u8", "youtube": "UC6y8T-vG9SeQ-FKOCt_o8MA", "color": "#DC2626" },
+    { "id": "diwantv", "name": "Diwan FM TV", "category": "Radio TV", "type": "youtube", "youtube": "UCOvTt3b378hpuUXgb46UdMQ", "color": "#0F766E" },
+    { "id": "jawharatv", "name": "Jawhara FM TV", "category": "Radio TV", "type": "youtube", "youtube": "UCXowBzuwUrjfRt68d5VphAg", "color": "#A21CAF" },
+    { "id": "expresstv", "name": "Express FM TV", "category": "Radio TV", "type": "youtube", "youtube": "UCsaqqAo0mZZIgdPjydZixMg", "color": "#2563EB" }
+  ],
+  "radio": [
+    { "id": "mosaique", "name": "Mosaique FM", "category": "Privées", "url": "https://radio.mosaiquefm.net/mosalive", "color": "#DC2626" },
+    { "id": "diwan", "name": "Diwan FM", "category": "Privées", "url": "https://streaming.diwanfm.net/stream", "color": "#0F766E" },
+    { "id": "jawhara", "name": "Jawhara FM", "category": "Privées", "url": "https://streaming2.toutech.net/jawharafm", "color": "#A21CAF" },
+    { "id": "express", "name": "Express FM", "category": "Privées", "url": "https://expressfm.ice.infomaniak.ch/expressfm-64.mp3", "color": "#2563EB" },
+    { "id": "knooz", "name": "Knooz FM", "category": "Privées", "url": "http://streaming.knoozfm.net:8000/knoozfm", "color": "#CA8A04" },
+    { "id": "sabra", "name": "Sabra FM", "category": "Privées", "url": "https://manager5.streamradio.fr:1905/stream", "color": "#DB2777" },
+    { "id": "alhayet", "name": "Al Hayet FM", "category": "Privées", "url": "https://manager8.streamradio.fr:2885/stream", "color": "#059669" },
+    { "id": "mosatarab", "name": "Mosaique Tarab", "category": "Musique", "url": "https://radio.mosaiquefm.net/mosatarab", "color": "#9F1239" },
+    { "id": "mosadj", "name": "Mosaique DJ", "category": "Musique", "url": "https://radio.mosaiquefm.net/mosadj", "color": "#4F46E5" },
+    { "id": "misk", "name": "Radio Misk", "category": "Musique", "url": "https://live.misk.art/stream", "color": "#0891B2" },
+    { "id": "nationale", "name": "Radio Nationale", "category": "Publiques", "url": "http://rtstream.tanitweb.com/nationale", "color": "#C8102E" },
+    { "id": "rtci", "name": "RTCI", "category": "Publiques", "url": "http://rtstream.tanitweb.com/rtci", "color": "#1D4ED8" },
+    { "id": "jeunes", "name": "Radio Jeunes", "category": "Publiques", "url": "http://rtstream.tanitweb.com/jeunes", "color": "#EA580C" },
+    { "id": "culturelle", "name": "Radio Culturelle", "category": "Publiques", "url": "http://rtstream.tanitweb.com/culturelle", "color": "#7C3AED" },
+    { "id": "zitounafm", "name": "Zitouna FM", "category": "Publiques", "url": "https://radio.radiotunisienne.tn/radiozaitouna", "color": "#15803D" },
+    { "id": "sfax", "name": "Radio Sfax", "category": "Régionales", "url": "http://rtstream.tanitweb.com/sfax", "color": "#0369A1" },
+    { "id": "monastir", "name": "Radio Monastir", "category": "Régionales", "url": "https://radio.radiotunisienne.tn/monastir", "color": "#0D9488" },
+    { "id": "kef", "name": "Radio Kef", "category": "Régionales", "url": "http://rtstream.tanitweb.com/kef", "color": "#65A30D" },
+    { "id": "gafsa", "name": "Radio Gafsa", "category": "Régionales", "url": "http://rtstream.tanitweb.com/gafsa", "color": "#B45309" },
+    { "id": "tataouine", "name": "Radio Tataouine", "category": "Régionales", "url": "http://rtstream.tanitweb.com/tataouine", "color": "#A16207" },
+    { "id": "coran", "name": "Radio Coran", "category": "Religion", "url": "http://stream.radiojar.com/0tpy1h0kxtzuv", "color": "#166534" }
+  ],
+  "news": [
+    { "id": "mosaique", "name": "Mosaique FM", "lang": "ar", "url": "https://www.mosaiquefm.net/ar/rss" },
+    { "id": "jawhara", "name": "Jawhara FM", "lang": "ar", "url": "https://www.jawharafm.net/ar/rss/showRss/88/1/1" },
+    { "id": "babnet", "name": "Babnet", "lang": "ar", "url": "https://www.babnet.net/feed.php" },
+    { "id": "lapresse", "name": "La Presse", "lang": "fr", "url": "https://lapresse.tn/feed/" },
+    { "id": "webdo", "name": "Webdo", "lang": "fr", "url": "https://www.webdo.tn/fr/feed/" },
+    { "id": "leaders", "name": "Leaders", "lang": "fr", "url": "https://www.leaders.com.tn/rss" }
+  ]
+}
