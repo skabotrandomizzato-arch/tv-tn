@@ -225,18 +225,15 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
     if (platform is AndroidWebViewController) {
       platform.setMediaPlaybackRequiresUserGesture(false);
     }
-    // YouTube requires an embedding origin (otherwise "error 153"),
-    // so the iframe is loaded from an HTML page with a base URL.
-    web.loadHtmlString('''
-<!DOCTYPE html><html><head>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<style>html,body{margin:0;height:100%;background:#000;overflow:hidden}
-iframe{position:absolute;inset:0;width:100%;height:100%;border:0}</style>
-</head><body>
-<iframe src="https://www.youtube.com/embed/live_stream?channel=$channelId&autoplay=1&playsinline=1&rel=0&modestbranding=1"
- allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
- referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</body></html>''', baseUrl: 'https://tounsilive.app');
+    // Many channels block the embedded player ("video unavailable"), so the
+    // channel's live page on mobile YouTube is opened instead.
+    web.setNavigationDelegate(NavigationDelegate(
+      // Stay inside the app: block "open in YouTube app" redirects.
+      onNavigationRequest: (req) => req.url.startsWith('http')
+          ? NavigationDecision.navigate
+          : NavigationDecision.prevent,
+    ));
+    web.loadRequest(Uri.parse('https://m.youtube.com/channel/$channelId/live'));
     _web = web;
   }
 
