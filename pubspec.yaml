@@ -100,3 +100,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Pin the Android plugins to the last versions before the JNI rewrite:
+# the JNI versions crash in release builds with NoSuchMethodError.
+dependency_overrides:
+  shared_preferences_android: 2.4.28
+  path_provider_android: 2.2.23
