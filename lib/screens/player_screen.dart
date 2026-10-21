@@ -13,7 +13,11 @@ import '../widgets/common.dart';
 class PlayerScreen extends StatefulWidget {
   final TvChannel channel;
   final List<TvChannel> channels;
-  const PlayerScreen({super.key, required this.channel, required this.channels});
+  const PlayerScreen({
+    super.key,
+    required this.channel,
+    required this.channels,
+  });
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -37,25 +41,35 @@ class _PlayerScreenState extends State<PlayerScreen> {
     super.dispose();
   }
 
+  /// Fullscreen is only on when the user asks for it, never just because
+  /// the device is in landscape (tablets are landscape all the time).
+  bool _fullscreen = false;
+
+  /// Keeps the same player alive when moving in and out of fullscreen.
+  GlobalKey _playerKey = GlobalKey();
+
   void _setFullscreen(bool on) {
+    setState(() => _fullscreen = on);
     if (on) {
-      SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     } else {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      // Back to whatever orientation the device and the user prefer.
+      SystemChrome.setPreferredOrientations([]);
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-      // Let the user rotate freely again once back in portrait.
-      Future.delayed(const Duration(seconds: 2),
-          () => SystemChrome.setPreferredOrientations([]));
     }
   }
 
   Future<void> _openYoutube() async {
     final id = _channel.youtubeChannelId;
     if (id == null) return;
-    await launchUrl(Uri.parse('https://www.youtube.com/channel/$id/live'),
-        mode: LaunchMode.externalApplication);
+    await launchUrl(
+      Uri.parse('https://www.youtube.com/channel/$id/live'),
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   @override
@@ -63,76 +77,110 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final landscape =
         MediaQuery.orientationOf(context) == Orientation.landscape;
     final player = ChannelPlayer(
-      key: ValueKey(_channel.id),
+      key: _playerKey,
       channel: _channel,
-      fullscreen: landscape,
-      onFullscreen: () => _setFullscreen(!landscape),
+      fullscreen: _fullscreen,
+      onFullscreen: () => _setFullscreen(!_fullscreen),
     );
 
-    if (landscape) {
+    if (_fullscreen) {
       return PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, _) => _setFullscreen(false),
-        child: Scaffold(backgroundColor: Colors.black, body: Center(child: player)),
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(child: player),
+        ),
       );
     }
 
     final scheme = Theme.of(context).colorScheme;
     final others = widget.channels.where((c) => c.id != _channel.id).toList();
-    return Scaffold(
-      appBar: AppBar(title: Text(_channel.name)),
-      body: Column(
-        children: [
-          AspectRatio(aspectRatio: 16 / 9, child: player),
-          ListTile(
-            leading: ChannelBadge(name: _channel.name, color: _channel.color),
-            title: Text(_channel.name,
-                style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Row(children: [
+    final details = Column(
+      children: [
+        ListTile(
+          leading: ChannelBadge(name: _channel.name, color: _channel.color),
+          title: Text(
+            _channel.name,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          subtitle: Row(
+            children: [
               const LiveDot(),
               const SizedBox(width: 6),
               Text(_channel.category),
-            ]),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+            ],
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_channel.youtubeChannelId != null)
+                IconButton(
+                  tooltip: 'Ouvrir dans YouTube',
+                  icon: const Icon(Icons.open_in_new_rounded),
+                  onPressed: _openYoutube,
+                ),
+              FavoriteButton(favKey: _channel.favKey),
+            ],
+          ),
+        ),
+        const Divider(height: 1),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Autres chaînes',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: others.length,
+            itemBuilder: (context, i) {
+              final c = others[i];
+              return ListTile(
+                leading: ChannelBadge(name: c.name, color: c.color, size: 40),
+                title: Text(c.name),
+                subtitle: Text(c.category),
+                onTap: () => setState(() {
+                  _channel = c;
+                  _playerKey = GlobalKey();
+                }),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: Text(_channel.name)),
+      body: landscape
+          // Landscape (tablet, or phone turned sideways): player on the
+          // left, channel info and list on the right.
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (_channel.youtubeChannelId != null)
-                  IconButton(
-                    tooltip: 'Ouvrir dans YouTube',
-                    icon: const Icon(Icons.open_in_new_rounded),
-                    onPressed: _openYoutube,
+                Expanded(
+                  flex: 3,
+                  child: Center(
+                    child: AspectRatio(aspectRatio: 16 / 9, child: player),
                   ),
-                FavoriteButton(favKey: _channel.favKey),
+                ),
+                Expanded(flex: 2, child: details),
+              ],
+            )
+          : Column(
+              children: [
+                AspectRatio(aspectRatio: 16 / 9, child: player),
+                Expanded(child: details),
               ],
             ),
-          ),
-          const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text('Autres chaînes',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: scheme.onSurfaceVariant)),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: others.length,
-              itemBuilder: (context, i) {
-                final c = others[i];
-                return ListTile(
-                  leading: ChannelBadge(name: c.name, color: c.color, size: 40),
-                  title: Text(c.name),
-                  subtitle: Text(c.category),
-                  onTap: () => setState(() => _channel = c),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -185,8 +233,10 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
   }
 
   Future<void> _startHls(String url) async {
-    final v = VideoPlayerController.networkUrl(Uri.parse(url),
-        formatHint: VideoFormat.hls);
+    final v = VideoPlayerController.networkUrl(
+      Uri.parse(url),
+      formatHint: VideoFormat.hls,
+    );
     _video = v;
     v.addListener(_onVideo);
     try {
@@ -227,12 +277,14 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
     }
     // Many channels block the embedded player ("video unavailable"), so the
     // channel's live page on mobile YouTube is opened instead.
-    web.setNavigationDelegate(NavigationDelegate(
-      // Stay inside the app: block "open in YouTube app" redirects.
-      onNavigationRequest: (req) => req.url.startsWith('http')
-          ? NavigationDecision.navigate
-          : NavigationDecision.prevent,
-    ));
+    web.setNavigationDelegate(
+      NavigationDelegate(
+        // Stay inside the app: block "open in YouTube app" redirects.
+        onNavigationRequest: (req) => req.url.startsWith('http')
+            ? NavigationDecision.navigate
+            : NavigationDecision.prevent,
+      ),
+    );
     web.loadRequest(Uri.parse('https://m.youtube.com/channel/$channelId/live'));
     _web = web;
   }
@@ -259,19 +311,21 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
     if (_error) {
       content = _ErrorView(onRetry: _retry);
     } else if (_web != null) {
-      content = Stack(children: [
-        WebViewWidget(controller: _web!),
-        Positioned(
-          right: 4,
-          bottom: 44,
-          child: _RoundButton(
-            icon: widget.fullscreen
-                ? Icons.fullscreen_exit_rounded
-                : Icons.fullscreen_rounded,
-            onTap: widget.onFullscreen,
+      content = Stack(
+        children: [
+          WebViewWidget(controller: _web!),
+          Positioned(
+            right: 4,
+            bottom: 44,
+            child: _RoundButton(
+              icon: widget.fullscreen
+                  ? Icons.fullscreen_exit_rounded
+                  : Icons.fullscreen_rounded,
+              onTap: widget.onFullscreen,
+            ),
           ),
-        ),
-      ]);
+        ],
+      );
     } else if (_video?.value.isInitialized ?? false) {
       final v = _video!;
       content = GestureDetector(
@@ -285,8 +339,9 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
           children: [
             Center(
               child: AspectRatio(
-                aspectRatio:
-                    v.value.aspectRatio > 0 ? v.value.aspectRatio : 16 / 9,
+                aspectRatio: v.value.aspectRatio > 0
+                    ? v.value.aspectRatio
+                    : 16 / 9,
                 child: VideoPlayer(v),
               ),
             ),
@@ -299,31 +354,33 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
                 ignoring: !_showControls,
                 child: Container(
                   color: Colors.black38,
-                  child: Stack(children: [
-                    Center(
-                      child: _RoundButton(
-                        size: 64,
-                        icon: v.value.isPlaying
-                            ? Icons.pause_rounded
-                            : Icons.play_arrow_rounded,
-                        onTap: () {
-                          v.value.isPlaying ? v.pause() : v.play();
-                          setState(() {});
-                        },
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: _RoundButton(
+                          size: 64,
+                          icon: v.value.isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          onTap: () {
+                            v.value.isPlaying ? v.pause() : v.play();
+                            setState(() {});
+                          },
+                        ),
                       ),
-                    ),
-                    const Positioned(left: 12, top: 12, child: LiveDot()),
-                    Positioned(
-                      right: 4,
-                      bottom: 4,
-                      child: _RoundButton(
-                        icon: widget.fullscreen
-                            ? Icons.fullscreen_exit_rounded
-                            : Icons.fullscreen_rounded,
-                        onTap: widget.onFullscreen,
+                      const Positioned(left: 12, top: 12, child: LiveDot()),
+                      Positioned(
+                        right: 4,
+                        bottom: 4,
+                        child: _RoundButton(
+                          icon: widget.fullscreen
+                              ? Icons.fullscreen_exit_rounded
+                              : Icons.fullscreen_rounded,
+                          onTap: widget.onFullscreen,
+                        ),
                       ),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -332,7 +389,8 @@ class _ChannelPlayerState extends State<ChannelPlayer> {
       );
     } else {
       content = const Center(
-          child: CircularProgressIndicator(color: Colors.white));
+        child: CircularProgressIndicator(color: Colors.white),
+      );
     }
     return ColoredBox(color: Colors.black, child: content);
   }
@@ -372,13 +430,21 @@ class _ErrorView extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.signal_wifi_bad_rounded,
-              color: Colors.white70, size: 40),
+          const Icon(
+            Icons.signal_wifi_bad_rounded,
+            color: Colors.white70,
+            size: 40,
+          ),
           const SizedBox(height: 8),
-          const Text('Diffusion indisponible pour le moment',
-              style: TextStyle(color: Colors.white70)),
+          const Text(
+            'Diffusion indisponible pour le moment',
+            style: TextStyle(color: Colors.white70),
+          ),
           const SizedBox(height: 12),
-          FilledButton.tonal(onPressed: onRetry, child: const Text('Réessayer')),
+          FilledButton.tonal(
+            onPressed: onRetry,
+            child: const Text('Réessayer'),
+          ),
         ],
       ),
     );
